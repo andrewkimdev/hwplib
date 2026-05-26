@@ -1,7 +1,6 @@
 package kr.dogfoot.hwplib.object.bodytext.paragraph.text;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * 일반 Character
@@ -46,10 +45,12 @@ public class HWPCharNormal extends HWPChar {
      * @return 변환된 문자열
      */
     private String intToString(int code) {
-        byte[] ch = new byte[2];
-        ch[0] = (byte) (code & 0xff);
-        ch[1] = (byte) ((code >> 8) & 0xff);
-        return new String(ch, 0, 2, StandardCharsets.UTF_16LE);
+        // 2 byte 문자코드를 그대로 보존한다. UTF-16 서러게이트 쌍(보충 평면 문자)은
+        // 두 개의 HWPCharNormal에 나뉘어 저장되는데, 각 2 byte를 따로 UTF-16LE로
+        // 디코딩하면 외톨이 서러게이트가 U+FFFD로 바뀐다. 코드 단위를 그대로 두면
+        // getCh()를 이어붙이는 StringBuilder에서 서러게이트 쌍이 올바른 코드 포인트로
+        // 다시 합쳐진다.
+        return String.valueOf((char) code);
     }
 
     public HWPChar clone() {
