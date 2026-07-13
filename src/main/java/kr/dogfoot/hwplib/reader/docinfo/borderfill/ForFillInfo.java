@@ -108,8 +108,8 @@ public class ForFillInfo {
      */
     public static void pictureInfo(PictureInfo pi, StreamReader sr)
             throws IOException {
-        pi.setBrightness(sr.readSInt1());
         pi.setContrast(sr.readSInt1());
+        pi.setBrightness(sr.readSInt1());
         pi.setEffect(PictureEffect.valueOf((byte) sr.readUInt1()));
         pi.setBinItemID(sr.readUInt2());
     }

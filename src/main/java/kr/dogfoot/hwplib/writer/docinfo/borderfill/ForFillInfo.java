@@ -101,8 +101,8 @@ public class ForFillInfo {
      */
     public static void pictureInfo(PictureInfo pi, StreamWriter sw)
             throws IOException {
-        sw.writeSInt1(pi.getBrightness());
         sw.writeSInt1(pi.getContrast());
+        sw.writeSInt1(pi.getBrightness());
         sw.writeUInt1(pi.getEffect().getValue());
         sw.writeUInt2(pi.getBinItemID());
     }
