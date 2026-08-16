@@ -60,6 +60,15 @@ public class ForControlCurve {
                     .readUInt1());
             scc.addCurveSegmentType(cst);
         }
-        sr.skip(4);
+        // The trailing 4 bytes (an unused/reserved field in some curve records) are not
+        // always present - some records end exactly after the segment-type list. Only
+        // consume them if the record actually still has bytes left; otherwise skip(4)
+        // unconditionally overruns into the next record's header and desyncs the reader.
+        if (!sr.isEndOfRecord()) {
+            sr.skip(4);
+        }
+        if (!sr.isEndOfRecord()) {
+            sr.skipToEndRecord();
+        }
     }
 }
