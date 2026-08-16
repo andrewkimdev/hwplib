@@ -201,7 +201,23 @@ public class ForParagraph {
             ffc.read(paragraph, sr);
         } else {
             Control c = paragraph.addNewControl(id);
-            ForControl.read(c, sr);
+            if (c != null) {
+                ForControl.read(c, sr);
+            } else {
+                // Unrecognized ctrlId (e.g. a track-changes/revision-wrapped
+                // control using an id FactoryForControl doesn't have an
+                // entry for) -> addNewControl already recorded a null
+                // placeholder in the control list, and there's no
+                // type-specific reader to dispatch to. Skip the rest of
+                // this CTRL_HEADER record's own declared payload (only 4 of
+                // its bytes were consumed above, reading the id); any
+                // deeper-level records belonging to this control are then
+                // safely consumed one at a time by the generic
+                // skipETCRecord() fallback in the caller's read() loop, the
+                // same as any other paragraph record this reader doesn't
+                // otherwise recognize.
+                sr.skipToEndRecord();
+            }
         }
     }
 
