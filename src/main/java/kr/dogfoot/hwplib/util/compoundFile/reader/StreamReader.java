@@ -38,9 +38,19 @@ public class StreamReader {
                         new ByteArrayInputStream(decompressed),
                         decompressed.length);
             } catch (Exception e) {
+                // Compressor.decompressedBytes() buffers ahead from `is` before it can
+                // detect invalid/incomplete deflate data, so by the time it throws, `is`
+                // may already be partially consumed at an arbitrary position. Reusing it
+                // here (as this used to do) silently hands back a misaligned/truncated
+                // blob the same length as the original stream, not the original bytes --
+                // corrupting entries that were never actually compressed in the first
+                // place (e.g. some BinData PNG streams under a doc-level compress flag
+                // that doesn't apply per-entry). Re-open a fresh, unread stream instead
+                // so the fallback really is "treat as uncompressed", not "whatever is
+                // left in the exhausted reader".
                 return new StreamReader().init(
                         fileVersion,
-                        is,
+                        documentInputStream(de, distribution),
                         de.getSize());
             }
         } else {
