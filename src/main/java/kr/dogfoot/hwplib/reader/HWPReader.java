@@ -3,6 +3,7 @@ package kr.dogfoot.hwplib.reader;
 import kr.dogfoot.hwplib.object.HWPFile;
 import kr.dogfoot.hwplib.object.docinfo.BinData;
 import kr.dogfoot.hwplib.object.docinfo.bindata.BinDataCompress;
+import kr.dogfoot.hwplib.object.docinfo.bindata.BinDataType;
 import kr.dogfoot.hwplib.object.etc.HWPTag;
 import kr.dogfoot.hwplib.object.fileheader.FileVersion;
 import kr.dogfoot.hwplib.org.apache.poi.hpsf.PropertySet;
@@ -273,14 +274,21 @@ public class HWPReader {
     }
 
     private BinDataCompress getCompressMethod(int id) {
-        BinData binData;
-        try {
-            binData = hwpFile.getDocInfo().getBinDataList().get(id - 1);
-        } catch (Exception e) {
-            binData = null;
-        }
-        if (binData != null) {
-            return binData.getProperty().getCompress();
+        // DocInfo's BIN_DATA records are not guaranteed to be stored in ascending
+        // binDataID order (files edited/re-saved by 한/글 can leave the declaration
+        // list out of order, e.g. a couple of entries moved to the front), so
+        // `get(id - 1)` can silently return a different record than the one that
+        // actually declared this id -- which then applies the wrong compress
+        // flag (e.g. borrowing a neighboring JPG record's NoCompress for a BMP
+        // entry that was really ByStorageDefault/compressed), causing the still
+        // -compressed raw bytes to be stored as-is instead of being inflated.
+        // Match by the record's own declared id instead of its list position.
+        for (BinData binData : hwpFile.getDocInfo().getBinDataList()) {
+            if ((binData.getProperty().getType() == BinDataType.Embedding
+                    || binData.getProperty().getType() == BinDataType.Storage)
+                    && binData.getBinDataID() == id) {
+                return binData.getProperty().getCompress();
+            }
         }
         return BinDataCompress.ByStorageDefault;
     }
