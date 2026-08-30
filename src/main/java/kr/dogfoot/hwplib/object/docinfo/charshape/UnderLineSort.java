@@ -15,7 +15,7 @@ public enum UnderLineSort {
      */
     Bottom((byte) 1),
     /**
-     * 글자 아래
+     * 글자 중간
      */
     Middle((byte) 2),
     /**

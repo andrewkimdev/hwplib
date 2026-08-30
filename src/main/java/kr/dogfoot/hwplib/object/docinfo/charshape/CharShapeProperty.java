@@ -227,7 +227,7 @@ public class CharShapeProperty {
     }
 
     /**
-     * 취소선 여부를 설정한다. (18~20 bit)
+     * 취소선 여부를 설정한다. (18 bit)
      *
      * @param strikeLine 취소선 여부
      */

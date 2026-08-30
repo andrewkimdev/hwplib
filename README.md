@@ -43,6 +43,13 @@ hwplib의 기능에 대한 질문, 버그 수정 요청은 issues 란을 이용�
 * hwpx 파일에 대한 라이브러리는 https://github.com/neolord0/hwpxlib 을 참조해 주세요.
 * hwp파일을 hwpx파일로 변환하는 라이브러리는 https://github.com/neolord0/hwp2hwpx 을 참조해 주세요.
 
+2026.8.17
+=========================================================================================
+* BinData 압축 방식 조회 시 목록 위치가 아닌 레코드에 실제 선언된 binDataID로 매칭하도록 수정
+* BinData 압축 해제 실패 시 이미 소비된 스트림을 재사용하지 않고 새로 열도록 수정
+* ForControlCurve의 무조건 skip(4)로 인한 gso Container 자식 레코드 desync 수정
+* 인식할 수 없는 ctrlId를 가진 컨트롤 처리 시 NullPointerException 수정
+
 2026.7.13
 =========================================================================================
 * PictueInfo에 brightness, contrast 속성 읽기/쓰기 수정
